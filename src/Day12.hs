@@ -1,6 +1,6 @@
 module Day12 where
 
-import Data.List
+import Data.List (nub)
 import qualified Data.Set as S
 
 type Section = (String, [Int])
@@ -42,10 +42,10 @@ generate template (first:rest) =
       restMinLength = sum rest + length rest - 1
       firstMaxLength = length template - restMinLength - 1
       firstMinLength = length template - restMaxLength - 1
-      firstOptions = concatMap (\l -> generate (take l template) [first]) [firstMinLength .. firstMaxLength]
+      firstOptions = concatMap (\l -> generate (take l template) [first]) [firstMaxLength, firstMaxLength - 1 .. firstMinLength]
       restOptions = map (\fo -> (fo, generate (drop (length fo + 1) template) rest)) firstOptions
       allOptions = concatMap (\(fo, ros) -> map (\ro -> fo ++ "." ++ ro) ros) restOptions
-  in  filter (satisfies template) allOptions
+  in  nub $ filter (satisfies template) allOptions
 
 getAnswerA = sum . map (\(template, ns) -> length $ generate template ns) . parseInput
 getAnswerB = sum . map (\(template, ns) -> length $ generate (concat $ replicate 5 template) (concat $ replicate 5 ns)) . parseInput
