@@ -22,7 +22,7 @@ maintainer:         m.lipovaca@cargox.io
 extra-source-files: CHANGELOG.md
 
 library
-    exposed-modules:  MyLib, Day8, Day9, Day10, Day11
+    exposed-modules:  Day12
 
     -- Modules included in this library but not exported.
     -- other-modules:
