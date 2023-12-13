@@ -32,7 +32,7 @@ library
     build-depends:    
         base ^>=4.17.2.0,
         containers >=0.6,
-        unordered-containers >=0.2.19.1
+        unordered-containers >=0.2.19.1,
         split >=0.2.4,
         array >=0.5.4.0
     hs-source-dirs:   src
