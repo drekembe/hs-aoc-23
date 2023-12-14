@@ -41,6 +41,6 @@ distance (x, y) (x', y') = abs (x - x') + abs (y - y')
 allPairs :: StarField -> [(Star, Star)]
 allPairs sf = [(x, y) | (x : ys) <- tails . S.toList . stars $ sf, y <- ys]
 
-getAnswerA = sum . map (uncurry distance) . allPairs . expand 2 . parseInput
+getAnswerA = show . sum . map (uncurry distance) . allPairs . expand 2 . parseInput
 
-getAnswerB = sum . map (uncurry distance) . allPairs . expand 1000000 . parseInput
+getAnswerB = show . sum . map (uncurry distance) . allPairs . expand 1000000 . parseInput

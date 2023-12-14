@@ -1,8 +1,8 @@
 module Day9 where
 
-getAnswerA = sum . map getNextNumber' . parseInput
+getAnswerA = show . sum . map getNextNumber' . parseInput
 
-getAnswerB = sum . map (getNextNumber' . reverse) . parseInput
+getAnswerB = show . sum . map (getNextNumber' . reverse) . parseInput
 
 parseInput = map (map read . words) . lines
 

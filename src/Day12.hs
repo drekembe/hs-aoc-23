@@ -50,6 +50,6 @@ generateMemo template' ns' = generate template' ns'
           allOptions = concatMap (\(fo, ros) -> map (\ro -> fo ++ "." ++ ro) ros) restOptions
       in  nub $ filter (satisfies template) allOptions
 
-getAnswerA = sum . map (\(template, ns) -> length $ generateMemo template ns) . parseInput
+getAnswerA = show . sum . map (\(template, ns) -> length $ generateMemo template ns) . parseInput
 
-getAnswerB = sum . map (\(template, ns) -> length $ generateMemo (intercalate "?" $ replicate 5 template) (concat $ replicate 5 ns)) . parseInput
+getAnswerB = show . sum . map (\(template, ns) -> length $ generateMemo (intercalate "?" $ replicate 5 template) (concat $ replicate 5 ns)) . parseInput

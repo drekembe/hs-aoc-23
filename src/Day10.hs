@@ -99,6 +99,6 @@ isInside pm (x, y) =
 numberOfPointsInside :: PipeMap -> Int
 numberOfPointsInside pm = M.size . M.filterWithKey (\coord _ -> isInside pm coord) $ pm
 
-getAnswerA = (`div` 2) . length . path . parseInput
+getAnswerA = show . (`div` 2) . length . path . parseInput
 
-getAnswerB = numberOfPointsInside . parseInput
+getAnswerB = show . numberOfPointsInside . parseInput

@@ -50,13 +50,13 @@ getRowSolutions mirror = sum $ map (*100) rowSolutions
         rowSolutions = map (getRowSolution mirror) [0..yEnd-1]
 
 flips :: Mirror -> [Mirror]
-flips mirror = [mirror A.// [((x,y), flip (x,y))] | x <- [xEnd, xEnd-1 .. 0], y <- [yEnd,yEnd-1..0]]
+flips mirror = [mirror A.// [((x,y), flip (x,y))] | x <- [0..xEnd], y <- [0..yEnd]]
   where
     (_,(xEnd, yEnd)) = A.bounds mirror
     flip (x,y) = let el = mirror A.! (x,y) in if el == '.' then '#' else '.'
 
 
-getAltSolutions mirror = sum $ toList (find (/= 0) ans)
+getAltSolutions mirror = (cs, rs, sols) -- sum $ toList (find (/= 0) ans)
   where cs = getColumnSolutions mirror
         rs = getRowSolutions mirror
         sols = map (\m -> (getColumnSolutions m, getRowSolutions m)) $ flips mirror
@@ -79,5 +79,5 @@ getSolutions mirror = sum $ columnSolutions ++ map (*100) rowSolutions
         rowSolutions = map (getRowSolution mirror) [0..yEnd-1]
 
 
-getAnswerA = sum . map getSolutions . parseInput
+getAnswerA = show . getAltSolutions . (!! 1) . parseInput
 getAnswerB _ = 3
