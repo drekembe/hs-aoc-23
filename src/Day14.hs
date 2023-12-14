@@ -28,7 +28,7 @@ moveNorth field = foldl (\arr c -> arr // zip [(c, y) | y <- [ys .. ye]] (bunchU
     ((xs, ys), (xe, ye)) = bounds field
 
 cycleField :: Field -> Field
-cycleField = rotateCw . moveNorth . rotateCw . moveNorth . rotateCw . moveNorth . rotateCw . moveNorth
+cycleField = (!! 4) . iterate (rotateCw . moveNorth)
 
 cycleFields :: S.Set Field -> Field -> Int -> [(S.Set Field, Field, Int, Int)]
 cycleFields seen field cycles = (seen, field, scoreField field, cycles) : next
@@ -43,7 +43,7 @@ scoreField field = sum $ map (\x -> scoreColumn $ getColumn x field) [xs .. xe]
     ((xs, ys), (xe, ye)) = bounds field
     scoreColumn x = sum $ zipWith (\s ch -> if ch == 'O' then s else 0) [length x, length x - 1 ..] x
 
-cycleUntilRepeat :: Field -> [(Int,Int)]
+cycleUntilRepeat :: Field -> [(Int, Int)]
 cycleUntilRepeat =
   map (\(s, f, score, cycle) -> (S.size s, score))
     . (\f -> cycleFields S.empty f 0)
@@ -51,8 +51,9 @@ cycleUntilRepeat =
 getAnswerA = show . scoreField . moveNorth . parseInput
 
 getAnswerB inp = show . snd $ results !! (1000000000 - lastBeforeBillion + cycleStartsAt)
-  where results = cycleUntilRepeat (parseInput inp)
-        firstRepeat = snd (last results)
-        cycleStartsAt = length $ takeWhile ((/=firstRepeat) . snd) results
-        cycleLength = length (drop cycleStartsAt results) - 1
-        lastBeforeBillion = head . dropWhile (<1000000000 - cycleLength) $ [cycleStartsAt, cycleStartsAt+cycleLength ..]
+  where
+    results = cycleUntilRepeat (parseInput inp)
+    firstRepeat = snd (last results)
+    cycleStartsAt = length $ takeWhile ((/= firstRepeat) . snd) results
+    cycleLength = length (drop cycleStartsAt results) - 1
+    lastBeforeBillion = head . dropWhile (< 1000000000 - cycleLength) $ [cycleStartsAt, cycleStartsAt + cycleLength ..]
