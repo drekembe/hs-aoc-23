@@ -22,8 +22,9 @@ parseInstruction instr
 step :: Boxes -> Instruction -> Boxes
 step bs (Add label power) = update present
   where present = M.lookup (hash label) bs >>= find ((==label) . fst)
-        update (Just _) = M.adjust (map (\(label',power') -> if label == label' then (label, power) else (label',power'))) (hash label) bs
-        update Nothing = let existing = M.findWithDefault [] (hash label) bs in M.insert (hash label) (existing ++ [(label, power)]) bs
+        update (Just _) = M.adjust (map switchLabel) (hash label) bs
+        update Nothing = M.insert (hash label) (M.findWithDefault [] (hash label) bs ++ [(label, power)]) bs
+        switchLabel (l,p) = if label == l then (label, power) else (l,p)
 step bs (Remove label) = M.adjust (filter (\(label',_) -> label /= label')) (hash label) bs
 
 lp :: [Lens] -> Int
