@@ -2,11 +2,11 @@ module Util (getColumn, getRow, rotateCcw, rotateCw, applyToCol) where
 import Data.Array
 
 
-getColumn c field = map (\y -> field ! (c,y)) [ys..ye]
-  where ((_,ys),(_,ye)) = bounds field
+getColumn c arr = map (\y -> arr ! (c,y)) [ys..ye]
+  where ((_,ys),(_,ye)) = bounds arr
 
-getRow r field = map (\x -> field ! (x,r)) [xs..xe]
-  where ((xs,_),(xe,_)) = bounds field
+getRow r arr = map (\x -> arr ! (x,r)) [xs..xe]
+  where ((xs,_),(xe,_)) = bounds arr
 
 
 rotateCcw arr = ixmap ((ys,xs),(ye,xe)) (\(x,y) -> (xe-y,x)) arr

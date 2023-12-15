@@ -2,13 +2,12 @@ module Day13 where
 
 import qualified Data.Array as A
 import Data.List.Split (splitOn)
-import Data.Maybe (isJust)
+import Data.Maybe (isJust, fromJust)
 import Data.Foldable (toList)
+import Util (getColumn, getRow)
 import Data.List
 
 type Mirror = A.Array (Int, Int) Char
-
-data Orientation = Row | Column deriving (Show, Eq)
 
 parseInput :: String -> [Mirror]
 parseInput = map parseMirror . splitOn [""] . lines
@@ -18,14 +17,6 @@ parseMirror lines = A.array ((0,0), (length (head lines) - 1 , length lines - 1)
   . concat
   . zipWith (\y line -> zipWith (\x ch -> ((x,y), ch)) [0..] line) [0..]
   $ lines
-
-getColumn :: Int -> Mirror -> String
-getColumn n mirror = map (\x -> mirror A.! (n,x)) [0..h]
-  where (_, (w,h)) = A.bounds mirror
-
-getRow :: Int -> Mirror -> String
-getRow n mirror = map (\x -> mirror A.! (x,n)) [0..w]
-  where (_, (w,h)) = A.bounds mirror
 
 getColumnSolution mirror delimiter = sum [delimiter + 1 | all (\(c1,c2) -> getColumn c1 mirror == getColumn c2 mirror ) compares]
   where (_, (end, _)) = A.bounds mirror
@@ -49,27 +40,23 @@ getRowSolutions mirror = sum $ map (*100) rowSolutions
   where (_, (xEnd, yEnd)) = A.bounds mirror
         rowSolutions = map (getRowSolution mirror) [0..yEnd-1]
 
+getRowSolutions' mirror = map id rowSolutions
+  where (_, (xEnd, yEnd)) = A.bounds mirror
+        rowSolutions = map (getRowSolution mirror) [0..yEnd-1]
+
 flips :: Mirror -> [Mirror]
-flips mirror = [mirror A.// [((x,y), flip (x,y))] | x <- [0..xEnd], y <- [0..yEnd]]
+flips mirror = [mirror A.// [((x,y), flip (x,y))] | x <- [xs..xEnd], y <- [ys..yEnd]]
   where
-    (_,(xEnd, yEnd)) = A.bounds mirror
+    ((xs, ys),(xEnd, yEnd)) = A.bounds mirror
     flip (x,y) = let el = mirror A.! (x,y) in if el == '.' then '#' else '.'
 
 
-getAltSolutions mirror = (cs, rs, sols) -- sum $ toList (find (/= 0) ans)
-  where cs = getColumnSolutions mirror
-        rs = getRowSolutions mirror
-        sols = map (\m -> (getColumnSolutions m, getRowSolutions m)) $ flips mirror
-        ans = 
-          if cs /= 0 then map (\(cs',rs') -> if cs' == cs then rs' else cs') sols
-                     else map (\(cs',rs') -> if rs' == rs then cs' else rs') sols
-          -- find (/= 0) 
-          -- . map (uncurry (+))
-          -- . filter (\(_, newRs) -> newRs /= rs)
-          -- . filter (\(newCs, _) -> newCs /= 0 && newCs /= cs)
-          --  filter (\(cs', rs') -> if cs == 0 then rs' /= rs else cs' /= cs) .
-          --  map (\m -> (getColumnSolutions m, getRowSolutions m))
-          -- $ flips mirror
+getAltSolutions mirror = fromJust $ find (/=existing) sols
+  where existing = head $ getSolutions' mirror
+        sols = concatMap getSolutions' $ flips mirror
+        -- ans = 
+        --   if cs /= 0 then map (\(cs',rs') -> if cs' == cs then rs' else cs') sols
+        --              else map (\(cs',rs') -> if rs' == rs then cs' else rs') sols
 
 
 getSolutions :: Mirror -> Int
@@ -78,6 +65,26 @@ getSolutions mirror = sum $ columnSolutions ++ map (*100) rowSolutions
         columnSolutions = map (getColumnSolution mirror) [0..xEnd-1]
         rowSolutions = map (getRowSolution mirror) [0..yEnd-1]
 
+getSolutions' :: Mirror -> [Int]
+getSolutions' mirror = filter (/= 0) $ columnSolutions ++ map (*100) rowSolutions
+  where (_, (xEnd, yEnd)) = A.bounds mirror
+        columnSolutions = map (getColumnSolution mirror) [0..xEnd-1]
+        rowSolutions = map (getRowSolution mirror) [0..yEnd-1]
 
-getAnswerA = show . getAltSolutions . (!! 1) . parseInput
-getAnswerB _ = 3
+
+mirrorToString m = unlines $ map (flip getRow m) [ys..ye]
+  where
+    ((xs, ys),(xe, ye)) = A.bounds m
+
+weird = id
+ ["#....#..#",
+  "#....#..#",
+  "..##..###",
+  "#####.##.",
+  "#####.##.",
+  "..##..###",
+  "#....#..#"]
+
+getAnswerA = show . sum . map getSolutions .  parseInput
+
+getAnswerB = show . sum . map getAltSolutions .  parseInput
