@@ -1,10 +1,10 @@
 module Day15 where
 
 import Data.List.Split (splitOn)
-import Data.List (takeWhile, find)
+import Data.List (find)
 import qualified Data.Map as M
 import Data.Char (ord)
-import Data.Maybe (isJust, fromJust)
+import Data.Maybe (fromJust)
 
 type Boxes = M.Map Int [Lens]
 type Lens = (String, Int)
