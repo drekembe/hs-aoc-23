@@ -1,4 +1,4 @@
-module Util (getColumn, getRow, rotateCcw, rotateCw, applyToCol) where
+module Util (getColumn, getRow, rotateCcw, rotateCw, applyToCol, inBounds) where
 import Data.Array
 
 
@@ -17,3 +17,6 @@ rotateCw arr = ixmap ((ys,xs),(ye,xe)) (\(x,y) -> (y,ye-x)) arr
 
 applyToCol n f arr = arr // zip [(n,y) | y <- [ys..ye]] (f (getColumn n arr))
   where ((xs,ys),(xe,ye)) = bounds arr
+
+inBounds arr (x,y) = (x >= xs) && (x <= xe) && (y >= ys) && (y <= ye)
+  where ((xs,ys), (xe,ye)) = bounds arr
