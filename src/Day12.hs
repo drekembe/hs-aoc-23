@@ -9,15 +9,6 @@ type Section = ([Char], [Int])
 
 type Cache = M.Map Section Int
 
-sample_ =
-  [ "???.### 1,1,3",
-    ".??..??...?##. 1,1,3",
-    "?#?#?#?#?#?#?#? 1,3,1,6",
-    "????.#...#... 4,1,1",
-    "????.######..#####. 1,6,5",
-    "?###???????? 3,2,1"
-  ]
-
 parseLine :: String -> Section
 parseLine st = (springs, map read $ splitOn "," groups)
   where
@@ -40,7 +31,9 @@ evalSection (springs, groups) = fst $ go M.empty springs groups
               Nothing -> go cache' ('#':rest) groups
               (Just foundRes') -> (foundRes', cache')
     go cache springs (g : roups)
-      | length springs >= g && notElem '.' (take g springs) && notElem '#' (take 1 (drop g springs)) = (res, M.insert (springs', roups) res cache')
+      | length springs >= g && 
+        notElem '.' (take g springs) && 
+        notElem '#' (take 1 (drop g springs)) = (res, M.insert (springs', roups) res cache')
       where 
         springs' = drop (g + 1) springs
         (res, cache') = case M.lookup (springs', roups) cache of
