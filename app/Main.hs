@@ -1,6 +1,6 @@
 module Main where
 import System.Environment
-import Day18 (getAnswerA, getAnswerB)
+import Day17 (getAnswerA, getAnswerB)
 
 main :: IO ()
 main = do
