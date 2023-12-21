@@ -35,8 +35,8 @@ sampleData2 = unlines [
   ]
 
 sampleData = unlines [
-  "in{s<2001:R,x>3998:R,A}",
-  "e{s<2001:R,x>3998:R,A}",
+  "in{s<4000:R,e}",
+  "e{x<4000:R,m<4000:R,a<4000:R,A}",
   "",
   "{x=787,m=2655,a=1222,s=2876}",
   "{x=1679,m=44,a=2067,s=496}",
@@ -48,7 +48,7 @@ sampleData = unlines [
 data WorkflowInstruction = WorkflowInstruction
   { num :: Int,
     letter :: Letter,
-    comparator :: Ordering, 
+    comparator :: Ordering,
     target :: Target
   } deriving (Show, Eq, Ord)
 
@@ -69,7 +69,7 @@ parseTarget other = Target other
 
 parseWorkflowInstruction (l : op : rest) =
   WorkflowInstruction
-    { 
+    {
       num = read ns,
       comparator = parseOp op,
       letter = parseL l,
@@ -103,37 +103,37 @@ workflowMap = foldr (\wf m -> M.insert (label wf) wf m) M.empty
 --processInput mm = sum . map (\i -> x i + m i + a i + s i ) . filter (\item -> processWorkflowMap mm item == Accept)
 
 applyToRanges :: WorkflowInstruction -> Ranges -> (Ranges, Ranges)
-applyToRanges 
-  (WorkflowInstruction { num=num', letter=X, comparator = LT }) 
-  (x'@(xmin, xmax),m'@(mmin, mmax),a'@(amin, amax),s'@(smin, smax)) = 
+applyToRanges
+  (WorkflowInstruction { num=num', letter=X, comparator = LT })
+  (x'@(xmin, xmax),m'@(mmin, mmax),a'@(amin, amax),s'@(smin, smax)) =
     (((xmin, min num' xmax),m',a',s'), ((max xmin (num'-1), xmax), m',a',s'))
-applyToRanges 
-  (WorkflowInstruction { num=num', letter=X, comparator = GT }) 
-  (x'@(xmin, xmax),m'@(mmin, mmax),a'@(amin, amax),s'@(smin, smax)) = 
+applyToRanges
+  (WorkflowInstruction { num=num', letter=X, comparator = GT })
+  (x'@(xmin, xmax),m'@(mmin, mmax),a'@(amin, amax),s'@(smin, smax)) =
     (((max xmin num', xmax),m',a',s'), ((xmin, min xmax (num'+1)), m',a',s'))
-applyToRanges 
-  (WorkflowInstruction { num=num', letter=M, comparator = LT }) 
-  (x'@(xmin, xmax),m'@(mmin, mmax),a'@(amin, amax),s'@(smin, smax)) = 
+applyToRanges
+  (WorkflowInstruction { num=num', letter=M, comparator = LT })
+  (x'@(xmin, xmax),m'@(mmin, mmax),a'@(amin, amax),s'@(smin, smax)) =
     ((x',(mmin, min mmax num'),a',s'), (x',(max mmin (num'-1), mmax), a',s'))
-applyToRanges 
-  (WorkflowInstruction { num=num', letter=M, comparator = GT }) 
-  (x'@(xmin, xmax),m'@(mmin, mmax),a'@(amin, amax),s'@(smin, smax)) = 
+applyToRanges
+  (WorkflowInstruction { num=num', letter=M, comparator = GT })
+  (x'@(xmin, xmax),m'@(mmin, mmax),a'@(amin, amax),s'@(smin, smax)) =
     ((x',(max mmin num', mmax),a',s'), (x',(mmin, min mmax (num'+1)), a',s'))
-applyToRanges 
-  (WorkflowInstruction { num=num', letter=A, comparator = LT }) 
-  (x'@(xmin, xmax),m'@(mmin, mmax),a'@(amin, amax),s'@(smin, smax)) = 
-    ((x',m',(amin, min amax num'),s'), (a', m',(max amin (num'-1), amax),s'))
-applyToRanges 
-  (WorkflowInstruction { num=num', letter=A, comparator = GT }) 
-  (x'@(xmin, xmax),m'@(mmin, mmax),a'@(amin, amax),s'@(smin, smax)) = 
+applyToRanges
+  (WorkflowInstruction { num=num', letter=A, comparator = LT })
+  (x'@(xmin, xmax),m'@(mmin, mmax),a'@(amin, amax),s'@(smin, smax)) =
+    ((x',m',(amin, min amax num'),s'), (x', m',(max amin (num'-1), amax),s'))
+applyToRanges
+  (WorkflowInstruction { num=num', letter=A, comparator = GT })
+  (x'@(xmin, xmax),m'@(mmin, mmax),a'@(amin, amax),s'@(smin, smax)) =
     ((x',m',(max amin num', amax),s'), (x', m',(amin, min amax (num'+1)),s'))
-applyToRanges 
-  (WorkflowInstruction { num=num', letter=S, comparator = LT }) 
-  (x'@(xmin, xmax),m'@(mmin, mmax),a'@(amin, amax),s'@(smin, smax)) = 
+applyToRanges
+  (WorkflowInstruction { num=num', letter=S, comparator = LT })
+  (x'@(xmin, xmax),m'@(mmin, mmax),a'@(amin, amax),s'@(smin, smax)) =
     ((x',m',a',(smin, min smax num')), (x', m',a',(max smin (num'-1), smax)))
-applyToRanges 
-  (WorkflowInstruction { num=num', letter=S, comparator = GT }) 
-  (x'@(xmin, xmax),m'@(mmin, mmax),a'@(amin, amax),s'@(smin, smax)) = 
+applyToRanges
+  (WorkflowInstruction { num=num', letter=S, comparator = GT })
+  (x'@(xmin, xmax),m'@(mmin, mmax),a'@(amin, amax),s'@(smin, smax)) =
     ((x',m',a',(max smin num', smax)), (x',m',a',(smin, min smax (num'+1))))
 
 
@@ -147,9 +147,9 @@ options wmap = go "in" ((0,4001),(0,4001),(0,4001),(0,4001))
                 ins = instructions wfi
                 ei = WorkflowInstruction { num = -1, comparator = GT, letter = X, target = noMatch wfi }
                 woo ranges [] = 0
-                woo ranges (i:is) = case target i of Target l' -> trace (l ++ " -> " ++ l') (go l' newR + woo newR' is)
-                                                     Reject -> trace (l ++ " -> R") $ woo newR' is
-                                                     Accept -> trace (l ++ " -> A: " ++ show newR) $ optionsInRanges newR + woo newR' is
+                woo ranges (i:is) = case target i of Target l' -> trace (concat [show i, ":", show newR, "!", show newR']) (go l' newR + woo newR' is)
+                                                     Reject -> trace (show i ++ ":" ++ show newR ++ "!" ++ show newR') $ woo newR' is
+                                                     Accept -> trace (show i ++ ":" ++ show newR ++ "!" ++ show newR') $ optionsInRanges newR + woo newR' is
                   where (newR, newR') = applyToRanges i ranges
 
 getAnswerA _ = "263678"
